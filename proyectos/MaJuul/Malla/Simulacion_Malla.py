@@ -94,7 +94,7 @@ def createRequestBody(project, branch, asof_date,name,processId,table,partition)
                     <property name="archivalFrequency" value="AMBIENTACIONES" valueType="string"/>
                     <property name="specificDelegate" valueType="object">
                         <object type="WorkFlow:taskNonKeyParameters" version="1.0">
-                            <property name="restartAllModules" value="false" valueType="boolean"/>
+                            <property name="restartAllModules" value="True" valueType="boolean"/>
                             <property name="variables" valueType="table"/>
                         </object>
                     </property>
@@ -284,7 +284,7 @@ def updateAXSL(procesos):
     columnas=['PROJECT_NAME','BRANCH_NAME','OBJECT_NAME','OBJECT_AS_OF_DATE','TABLE_NAME','PARTITION_NAME','INSTANCE_KEYS','STATUS','TASK_ID','START_TIME','FINISH_TIME','EXEC_TIME']
     df=pd.DataFrame(procesos,columns=columnas)
     try:
-        df.to_excel(r'C:\Users\jolocast\Downloads\Ambientaciones\Ambientacion_resultado.xlsx', index=False,header=True)
+        df.to_excel(r'C:\Users\jolocast\Downloads\Ambientaciones\Ambientacion.xlsx', index=False,header=True)
         print('aqui guarda')
     except:
         print('Por favor cierre el archivo de Excel')
@@ -440,8 +440,13 @@ def runProcess(proceso,fila,procesos):
     print(asof_date)
     table=proceso[4]
     partition=proceso[5]
-    body=createRequestBody(projectName,branchName,asof_date,wfName,processName,table,partition)
-    taskId=startTask(body)
+    if (len(str(partition))<4):
+        body=createRequestBody(projectName,branchName,asof_date,wfName,processName,table,'')
+        taskId=startTask(body)
+    else:
+        body=createRequestBody(projectName,branchName,asof_date,wfName,processName,table,partition)
+        taskId=startTask(body)
+
     if (taskId!=''):
         procesos=updateTaskStatus(procesos,fila-1,'START')
         procesos=updateTaskId(procesos,fila-1,taskId)
