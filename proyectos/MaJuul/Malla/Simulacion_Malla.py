@@ -434,9 +434,10 @@ def runProcess(proceso,fila,procesos):
     print(procesos)
     #asof_date='2023-03-31 00:00:00' 
     asof_date=proceso[3]
-    #day=time.localtime().tm_mday
-    #print(day)
-    #asof_date=time.strftime('%Y-%m-{0} 00:00:00.0'.format(day))
+    if (len(str(asof_date)) <4 ):
+        day=time.localtime().tm_mday
+        print(day)
+        asof_date=time.strftime('%Y-%m-{0} 00:00:00.0'.format(day))
     print(asof_date)
     table=proceso[4]
     partition=proceso[5]
