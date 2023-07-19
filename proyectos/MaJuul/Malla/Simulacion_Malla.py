@@ -181,6 +181,127 @@ def createRequestBody(project, branch, asof_date,name,processId,table,partition)
             '''.format(project,branch,asof_date,name,processId,nombreVariable,valor)
     return body
 
+def createRequestBodySaldosDiarios(project, branch, asof_date,name,processId,table,partition,date_file_name):
+    """Función para generar el Body de la petición
+
+    Args:
+        project (String): Proyecto que contiene el WF ejecutar
+        branch (String): Branch que contiene el WF a ejecutar
+        asof_date (String): As Of Date de la ejecución
+        name (String): Nombre del WF a ejecutar
+        processId (String): ID del proceso en el AXSL
+        variables (String): Variables de ejecución del WF
+
+    Returns:
+        Body(String): Body para ser usado en la petición
+    """
+    
+    if(True):
+        body='''
+        <object type="TaskSpec" version="1.0">
+            <property name="projectName" value="{0}" valueType="string" />
+            <property name="branchName" value="{1}" valueType="string" />
+            <property name="taskType" value="WorkFlow" valueType="string" />
+            <property name="asOfDate" value="{2}" valueType="date"/>
+            <property name="underlyingObject" valueType="url">WorkFlow["{3}"]</property>
+            <property name="nonKeyParameters" valueType="object">
+                <object type="Task:nonKeyParameters" version="1.0">
+                    <property name="id" value="{4}" valueType="string"/>
+                    <property name="archivalFrequency" value="AMBIENTACIONES" valueType="string"/>
+                    <property name="specificDelegate" valueType="object">
+                        <object type="WorkFlow:taskNonKeyParameters" version="1.0">
+                            <property name="restartAllModules" value="True" valueType="boolean"/>
+                            <property name="variables" valueType="table"/>
+                        </object>
+                    </property>
+                </object>
+        </property>
+        <property name="instanceKeyValues" valueType="table">
+            <object type="InstanceKeyValue" version="1.0">
+                <property name="name" value="version" valueType="string"/>
+                <property name="keyValueType" value="INTEGER" valueType="string"/>
+                <property name="keyValue" value="0" valueType="string"/>
+            </object>
+            <object type="InstanceKeyValue" version="1.0">
+                <property name="name" value="filing_version" valueType="string"/>
+                <property name="keyValueType" value="INTEGER" valueType="string"/>
+                <property name="keyValue" value="0" valueType="string"/>
+            </object>
+            <object type="InstanceKeyValue" version="1.0">
+                <property name="name" value="date_file_name" valueType="string"/>
+                <property name="keyValueType" value="INTEGER" valueType="string"/>
+                <property name="keyValue" value="{7}" valueType="string"/>
+            </object>
+            </property>
+            <property name="keyParameters" valueType="object">
+                <object type="WorkFlow:taskKeyParameters" version="1.0">
+                    <property name="streams" valueType="table" />
+                    <property name="variables" valueType="table">
+                        <object type="Variable:value" version="[1.0]">
+                            <property name="name" value="table" valueType="string"/>
+                            <property name="stringValue" value="{5}" valueType="string"/>
+                        </object>
+                        <object type="Variable:value" version="[1.0]">
+                            <property name="name" value="partition" valueType="string"/>
+                            <property name="stringValue" value="{6}" valueType="string"/>
+                        </object>
+                    </property>
+			        <property name="inMemoryExecution" value="false" valueType="boolean" />
+		        </object>
+	        </property> 
+
+</object>
+            '''.format(project,branch,asof_date,name,processId,table,partition,date_file_name)
+    else: 
+        #nombreVariable,valor=variables.split('=')
+        body='''
+        <object type="TaskSpec" version="1.0">
+            <property name="projectName" value="{0}" valueType="string" />
+            <property name="branchName" value="{1}" valueType="string" />
+            <property name="taskType" value="WorkFlow" valueType="string" />
+            <property name="asOfDate" value="{2}" valueType="date"/>
+            <property name="underlyingObject" valueType="url">WorkFlow["{3}"]</property>
+            <property name="nonKeyParameters" valueType="object">
+                <object type="Task:nonKeyParameters" version="1.0">
+                    <property name="id" value="{4}" valueType="string"/>
+                    <property name="archivalFrequency" value="" valueType="string"/>
+                    <property name="specificDelegate" valueType="object">
+                        <object type="WorkFlow:taskNonKeyParameters" version="1.0">
+                            <property name="restartAllModules" value="false" valueType="boolean"/>
+                            <property name="variables" valueType="table"/>
+                        </object>
+                    </property>
+                </object>
+        </property>
+        <property name="instanceKeyValues" valueType="table">
+            <object type="InstanceKeyValue" version="1.0">
+                <property name="name" value="version" valueType="string"/>
+                <property name="keyValueType" value="INTEGER" valueType="string"/>
+                <property name="keyValue" value="0" valueType="string"/>
+            </object>
+            <object type="InstanceKeyValue" version="1.0">
+                <property name="name" value="filing_version" valueType="string"/>
+                <property name="keyValueType" value="INTEGER" valueType="string"/>
+                <property name="keyValue" value="0" valueType="string"/>
+            </object>
+            </property>
+            <property name="keyParameters" valueType="object">
+                <object type="WorkFlow:taskKeyParameters" version="1.0">
+                    <property name="streams" valueType="table" />
+                    <property name="variables" valueType="table">
+                        <object type="Variable:value" version="[1.0]">
+                            <property name="name" value="{5}" valueType="string"/>
+                            <property name="stringValue" value="{6}" valueType="string"/>
+                        </object>
+                    </property>
+                    <property name="inMemoryExecution" value="false" valueType="boolean" />
+                </object>
+            </property> 
+
+        </object>
+            '''.format(project,branch,asof_date,name,processId,nombreVariable,valor)
+    return body
+
 def startTask(body):
     '''
     Parameters
@@ -441,12 +562,19 @@ def runProcess(proceso,fila,procesos):
     print(asof_date)
     table=proceso[4]
     partition=proceso[5]
-    if (len(str(partition))<4):
-        body=createRequestBody(projectName,branchName,asof_date,wfName,processName,table,'')
+    date_file_name=proceso[6]
+    if (len(date_file_name)>27):
+        date_file_name=date_file_name[42:]
+        body=createRequestBodySaldosDiarios(projectName,branchName,asof_date,wfName,processName,table,partition,date_file_name)
         taskId=startTask(body)
+
     else:
-        body=createRequestBody(projectName,branchName,asof_date,wfName,processName,table,partition)
-        taskId=startTask(body)
+        if (len(str(partition))<4):
+            body=createRequestBody(projectName,branchName,asof_date,wfName,processName,table,'')
+            taskId=startTask(body)
+        else:
+            body=createRequestBody(projectName,branchName,asof_date,wfName,processName,table,partition)
+            taskId=startTask(body)
 
     if (taskId!=''):
         procesos=updateTaskStatus(procesos,fila-1,'START')
