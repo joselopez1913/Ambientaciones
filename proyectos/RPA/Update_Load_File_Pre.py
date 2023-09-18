@@ -20,7 +20,7 @@ Created on Wed Aug 24 10:46:15 2022
 """
 fileName='Ambientacion.xlsx'
 ocNumber='Objeto modificado para ambientación'
-driver=webdriver.Chrome('C:\Proyectos\chromedriver.exe')
+driver=webdriver.Chrome(r'C:\Users\jolocast\Downloads\Ambientaciones\Ambientaciones\proyectos\chromedriver.exe')
 wait=WebDriverWait(driver,10)
 waitScenario=WebDriverWait(driver,3)
 waitSaved=WebDriverWait(driver,2)

@@ -94,7 +94,7 @@ def createRequestBody(project, branch, asof_date,name,processId,table,partition)
                     <property name="archivalFrequency" value="AMBIENTACIONES" valueType="string"/>
                     <property name="specificDelegate" valueType="object">
                         <object type="WorkFlow:taskNonKeyParameters" version="1.0">
-                            <property name="restartAllModules" value="True" valueType="boolean"/>
+                            <property name="restartAllModules" value="False" valueType="boolean"/>
                             <property name="variables" valueType="table"/>
                         </object>
                     </property>
